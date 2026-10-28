@@ -7,8 +7,22 @@ const {
   updateAppointment,
   deleteAppointment,
 } = require('../controllers/appointmentController');
+const { protect, restrictTo } = require('../middleware/authMiddleware');
 
-router.route('/').get(getAppointments).post(createAppointment);
-router.route('/:id').get(getAppointmentById).put(updateAppointment).delete(deleteAppointment);
+// GET  /api/appointments        — any authenticated user
+// POST /api/appointments        — any authenticated user (book an appointment)
+router
+  .route('/')
+  .get(protect, getAppointments)
+  .post(protect, createAppointment);
+
+// GET    /api/appointments/:id  — any authenticated user
+// PUT    /api/appointments/:id  — any authenticated user (update own; admin can do all)
+// DELETE /api/appointments/:id  — admin only
+router
+  .route('/:id')
+  .get(protect, getAppointmentById)
+  .put(protect, updateAppointment)
+  .delete(protect, restrictTo('admin'), deleteAppointment);
 
 module.exports = router;

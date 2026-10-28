@@ -19,6 +19,8 @@ export default function Navbar({
   onSeedData,
   isSeeding,
   apiStatus,
+  user,
+  onLogout,
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -78,8 +80,8 @@ export default function Navbar({
               onClick={() => handleTabClick('dashboard')}
               className="flex items-center gap-2.5 sm:gap-3 cursor-pointer select-none group shrink-0"
             >
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl gradient-to-tr from-teal-600 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-teal-500/20 group-hover:scale-105 transition-transform">
-                <SparklesIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl gradient-to-tr from-teal-600 to-cyan-500 flex items-center justify-center  shadow-md shadow-teal-500/20 group-hover:scale-105 transition-transform">
+                <StethoscopeIcon className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div className="flex flex-col">
                 <div className="flex items-center gap-1.5 sm:gap-2">
@@ -120,9 +122,9 @@ export default function Navbar({
             <div className="hidden md:flex items-center gap-2 sm:gap-3">
               {/* API Status Pill */}
               <div
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
+                className={`flex items-center gap-1.5 px-1 py-1 rounded-full text-xs font-medium border transition-colors ${
                   apiStatus === 'connected'
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    ? 'bg-emerald-500 text-emerald-700 border-emerald-200'
                     : apiStatus === 'connecting'
                     ? 'bg-amber-50 text-amber-700 border-amber-200'
                     : 'bg-rose-50 text-rose-700 border-rose-200'
@@ -133,16 +135,8 @@ export default function Navbar({
                     : 'Backend API unreachable'
                 }
               >
-                <span
-                  className={`w-2 h-2 rounded-full ${
-                    apiStatus === 'connected'
-                      ? 'bg-emerald-500 animate-pulse'
-                      : apiStatus === 'connecting'
-                      ? 'bg-amber-500 animate-ping'
-                      : 'bg-rose-500'
-                  }`}
-                />
-                <span className="hidden xl:inline">
+               
+                <span className="hidden ">
                   {apiStatus === 'connected'
                     ? 'Atlas Connected'
                     : apiStatus === 'connecting'
@@ -173,13 +167,26 @@ export default function Navbar({
               </button>
 
               {/* Book Appointment CTA Button */}
-              <button
-                onClick={onOpenAppointmentModal}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 active:bg-teal-800 rounded-xl shadow-sm shadow-teal-600/25 transition-all cursor-pointer active:scale-95"
-              >
-                <CalendarIcon className="w-4 h-4" />
-                <span>Book Appointment</span>
-              </button>
+             
+
+              {/* User Info + Logout */}
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 border border-teal-200 rounded-xl">
+                  <div className="w-6 h-6 rounded-full bg-teal-600 flex items-center justify-center text-white text-xs font-bold uppercase">
+                    {user?.name?.[0] || 'U'}
+                  </div>
+                  <span className="text-xs font-semibold text-teal-700 hidden lg:inline max-w-[100] truncate">
+                    {user?.name || 'User'}
+                  </span>
+                </div>
+                <button
+                  onClick={onLogout}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-semibold text-slate-600 bg-white hover:bg-rose-50 hover:text-rose-700 border border-slate-300 hover:border-rose-300 rounded-xl shadow-xs transition-all cursor-pointer active:scale-95"
+                  title="Sign out"
+                >
+                  <span>Logout</span>
+                </button>
+              </div>
             </div>
 
             {/* Mobile Header Right: Quick Action & Hamburger Toggle */}
@@ -196,7 +203,7 @@ export default function Navbar({
 
               {/* Status Dot */}
               <div
-                className={`w-2.5 h-2.5 rounded-full mx-1 ${
+                className={`w-2 h-2 rounded-full  ${
                   apiStatus === 'connected'
                     ? 'bg-emerald-500 animate-pulse'
                     : apiStatus === 'connecting'
@@ -289,40 +296,31 @@ export default function Navbar({
                 />
                 <span>{isSeeding ? 'Seeding Data...' : 'Load Demo Sample Data'}</span>
               </button>
-            </div>
-
-            {/* Mobile API Status Card */}
-            <div className="pt-2">
-              <div
-                className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium border ${
-                  apiStatus === 'connected'
-                    ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                    : apiStatus === 'connecting'
-                    ? 'bg-amber-50 text-amber-800 border-amber-200'
-                    : 'bg-rose-50 text-rose-800 border-rose-200'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`w-2.5 h-2.5 rounded-full ${
-                      apiStatus === 'connected'
-                        ? 'bg-emerald-500 animate-pulse'
-                        : apiStatus === 'connecting'
-                        ? 'bg-amber-500 animate-ping'
-                        : 'bg-rose-500'
-                    }`}
-                  />
-                  <span>
-                    Backend API:{' '}
-                    <strong className="capitalize">{apiStatus}</strong>
-                  </span>
-                </div>
-                <span className="text-[11px] opacity-75">
-                  {apiStatus === 'connected' ? 'MongoDB Atlas' : 'Localhost:5001'}
-                </span>
               </div>
+            
+
+            {/* User + Logout — Mobile Dropdown Bottom */}
+            <div className="pt-2 border-t border-slate-100 space-y-2">
+              <div className="flex items-center gap-3 px-3 py-2 bg-teal-50 rounded-xl border border-teal-100">
+                <div className="w-8 h-8 rounded-full bg-teal-600 flex items-center justify-center text-white text-sm font-bold uppercase shrink-0">
+                  {user?.name?.[0] || 'U'}
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-sm font-semibold text-slate-800 truncate">{user?.name || 'User'}</span>
+                  <span className="text-xs text-slate-500 truncate">{user?.email || ''}</span>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onLogout();
+                }}
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-white hover:bg-rose-50 text-rose-600 hover:text-rose-700 text-sm font-semibold border border-rose-200 rounded-xl transition-all"
+              >
+                <span>Logout</span>
+              </button>
             </div>
-          </div>
+         </div>
         )}
       </header>
 

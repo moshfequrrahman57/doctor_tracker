@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Dashboard from '../components/Dashboard';
 import AppointmentsList from '../components/AppointmentsList';
@@ -10,13 +12,16 @@ import DoctorModal from '../components/DoctorModal';
 import { api } from '../lib/api';
 
 export default function Home() {
+  const { isAuthenticated, loading: authLoading, logout, user } = useAuth();
+  const router = useRouter();
+
   const [activeTab, setActiveTab] = useState('dashboard');
   const [stats, setStats] = useState(null);
   const [doctors, setDoctors] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSeeding, setIsSeeding] = useState(false);
-  const [apiStatus, setApiStatus] = useState('connecting'); // 'connected' | 'connecting' | 'error'
+  const [apiStatus, setApiStatus] = useState('connecting');
   const [errorMessage, setErrorMessage] = useState('');
 
   // Modals
@@ -30,10 +35,15 @@ export default function Home() {
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
-    setTimeout(() => {
-      setToast(null);
-    }, 3500);
+    setTimeout(() => setToast(null), 3500);
   };
+
+  // ── Auth guard: redirect unauthenticated users to /login ──
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.replace('/login');
+    }
+  }, [isAuthenticated, authLoading, router]);
 
   // Fetch initial data
   const fetchData = useCallback(async () => {
@@ -41,9 +51,7 @@ export default function Home() {
       setLoading(true);
       setErrorMessage('');
 
-      // Check health first
       const health = await api.checkHealth().catch(() => null);
-
       if (!health) {
         setApiStatus('error');
         setErrorMessage(
@@ -73,8 +81,8 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (isAuthenticated) fetchData();
+  }, [isAuthenticated, fetchData]);
 
   // Seed sample data handler
   const handleSeedData = async () => {
@@ -156,6 +164,15 @@ export default function Home() {
     setIsApptModalOpen(true);
   };
 
+  // While auth is resolving or user is not yet authenticated, show loading screen
+  if (authLoading || !isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="w-10 h-10 border-4 border-teal-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       {/* Navbar */}
@@ -169,6 +186,8 @@ export default function Home() {
         onSeedData={handleSeedData}
         isSeeding={isSeeding}
         apiStatus={apiStatus}
+        user={user}
+        onLogout={logout}
       />
 
       {/* Offline / Connection Error Banner */}
@@ -179,14 +198,12 @@ export default function Home() {
               <span className="font-bold">⚠️ Backend Server Offline:</span>
               <span>{errorMessage}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={fetchData}
-                className="px-3 py-1 bg-white text-rose-700 font-semibold text-xs rounded-lg shadow-sm hover:bg-rose-50 transition-colors"
-              >
-                Retry Connection
-              </button>
-            </div>
+            <button
+              onClick={fetchData}
+              className="px-3 py-1 bg-white text-rose-700 font-semibold text-xs rounded-lg shadow-sm hover:bg-rose-50 transition-colors"
+            >
+              Retry Connection
+            </button>
           </div>
         </div>
       )}
@@ -285,12 +302,9 @@ export default function Home() {
       <footer className="mt-auto border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-500 mb-16 md:mb-0">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <span>DoctorTracker • Healthcare Management System</span>
-          <span className="text-slate-400">
-            Powered by Express.js, MongoDB Atlas & Next.js
-          </span>
+          <span className="text-slate-400">Powered by Express.js, MongoDB Atlas &amp; Next.js</span>
         </div>
       </footer>
     </div>
-
   );
 }

@@ -1,6 +1,5 @@
 const Appointment = require('../models/Appointment');
 const Doctor = require('../models/Doctor');
-
 // @desc    Get all appointments with filters
 // @route   GET /api/appointments
 exports.getAppointments = async (req, res) => {

@@ -1,6 +1,7 @@
 const Doctor = require('../models/Doctor');
 const Appointment = require('../models/Appointment');
 
+
 // @desc    Get all doctors with optional filtering and search
 // @route   GET /api/doctors
 exports.getDoctors = async (req, res) => {

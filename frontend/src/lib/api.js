@@ -3,12 +3,29 @@ const API_BASE_URL =
 
 async function request(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
+  
+  const headers = {
+    'Content-Type': 'application/json',
+    ...options.headers,
+  };
+
+  if (typeof window !== 'undefined' && !headers.Authorization) {
+    try {
+      const stored = localStorage.getItem('dt_user');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed?.token) {
+          headers['Authorization'] = `Bearer ${parsed.token}`;
+        }
+      }
+    } catch {
+      // Ignore JSON parse errors
+    }
+  }
+
   const config = {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
     ...options,
+    headers,
   };
 
   try {
@@ -25,6 +42,21 @@ async function request(endpoint, options = {}) {
 }
 
 export const api = {
+  // Auth
+  login: (credentials) =>
+    request('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+    }),
+
+  register: (userData) =>
+    request('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(userData),
+    }),
+
+  getMe: () => request('/auth/me'),
+
   // Health
   checkHealth: () => request('/health'),
 

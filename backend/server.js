@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const connectDB = require('./src/config/db');
 
+
 // Load environment variables
 dotenv.config();
 
@@ -45,6 +46,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Mount Routes
+app.use('/api/auth', require('./src/routes/authRoutes'));
 app.use('/api/doctors', require('./src/routes/doctorRoutes'));
 app.use('/api/appointments', require('./src/routes/appointmentRoutes'));
 app.use('/api/stats', require('./src/routes/statsRoutes'));
