@@ -4,6 +4,7 @@
   "private": true,
   "description": "Doctor Tracker application with Next.js frontend, Express.js backend, and MongoDB Atlas",
   "scripts": {
+    "dev": "npm run dev:backend & npm run dev:frontend",
     "dev:backend": "npm --prefix backend run dev",
     "dev:frontend": "npm --prefix frontend run dev",
     "start:backend": "npm --prefix backend run start",
