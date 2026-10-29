@@ -15,6 +15,21 @@ export default function LoginPage() {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState('');
+  const [successNotice, setSuccessNotice] = useState('');
+
+  // Check for registration query param
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('registered') === 'true') {
+        setSuccessNotice('Account created successfully! Please sign in with your credentials.');
+        const emailParam = params.get('email');
+        if (emailParam) {
+          setForm((prev) => ({ ...prev, email: emailParam }));
+        }
+      }
+    }
+  }, []);
 
   // If already logged in, redirect to home
   useEffect(() => {
@@ -36,6 +51,7 @@ export default function LoginPage() {
     setForm((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: '' }));
     if (serverError) setServerError('');
+    if (successNotice) setSuccessNotice('');
   };
 
   const handleSubmit = async (e) => {
@@ -104,6 +120,14 @@ export default function LoginPage() {
           {/* Form */}
           <div className="px-6 py-6">
             <form onSubmit={handleSubmit} noValidate className="space-y-4">
+
+              {/* Registration success banner */}
+              {successNotice && (
+                <div className="flex items-center gap-2 px-3.5 py-2.5 bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm rounded-xl">
+                  <span>✅</span>
+                  <span>{successNotice}</span>
+                </div>
+              )}
 
               {/* Server error banner */}
               {serverError && (

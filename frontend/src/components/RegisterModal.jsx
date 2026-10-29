@@ -3,12 +3,10 @@
 import { useState } from 'react';
 import { XMarkIcon, UserIcon, LockClosedIcon, EyeIcon, EyeSlashIcon, StethoscopeIcon, PhoneIcon } from './Icons';
 import { api } from '../lib/api';
-import { useAuth } from '../context/AuthContext';
 
 const SEX_OPTIONS = ['Male', 'Female'];
 
 export default function RegisterModal({ isOpen, onClose, onOpenLogin, onSuccess }) {
-  const { login } = useAuth();
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -107,16 +105,16 @@ export default function RegisterModal({ isOpen, onClose, onOpenLogin, onSuccess 
       };
 
       const res = await api.register(payload);
-      setSuccessMessage('Registration successful! Logging you in...');
-      if (res.user && res.token) {
-        login({
-          ...res.user,
-          token: res.token,
-        });
-      }
-      if (onSuccess) {
-        onSuccess(res);
-      }
+      setSuccessMessage('Registration successful! Redirecting to login...');
+      setTimeout(() => {
+        if (onSuccess) {
+          onSuccess({ ...res, email: payload.email });
+        } else if (onOpenLogin) {
+          onOpenLogin();
+        } else {
+          handleClose();
+        }
+      }, 700);
     } catch (err) {
       setServerError(err.message || 'Registration failed. Please try again.');
       setIsSubmitting(false);
@@ -417,7 +415,7 @@ export default function RegisterModal({ isOpen, onClose, onOpenLogin, onSuccess 
                     {successMessage ? (
                       <span className="flex items-center justify-center gap-2">
                         <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        Logging in...
+                        Redirecting to login...
                       </span>
                     ) : isSubmitting ? (
                       <span className="flex items-center justify-center gap-2">
