@@ -35,10 +35,7 @@ export default function RegisterPage() {
         isOpen={true}
         onClose={() => router.push('/login')}
         onOpenLogin={() => router.push('/login')}
-        onSuccess={(data) => {
-          const email = data?.user?.email || data?.email || '';
-          router.push(`/login?registered=true${email ? `&email=${encodeURIComponent(email)}` : ''}`);
-        }}
+        onSuccess={() => router.replace('/')}
       />
     </div>
   );
