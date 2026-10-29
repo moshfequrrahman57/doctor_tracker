@@ -14,7 +14,7 @@ const { protect, restrictTo } = require('../middleware/authMiddleware');
 router
   .route('/')
   .get(protect, getDoctors)
-  .post(protect, restrictTo('admin'), createDoctor);
+  .post(protect,  createDoctor);
 
 // GET    /api/doctors/:id  — any authenticated user
 // PUT    /api/doctors/:id  — admin only
@@ -22,7 +22,7 @@ router
 router
   .route('/:id')
   .get(protect, getDoctorById)
-  .put(protect, restrictTo('admin'), updateDoctor)
-  .delete(protect, restrictTo('admin'), deleteDoctor);
+  .put(protect,  updateDoctor)
+  .delete(protect,deleteDoctor);
 
 module.exports = router;

@@ -23,6 +23,6 @@ router
   .route('/:id')
   .get(protect, getAppointmentById)
   .put(protect, updateAppointment)
-  .delete(protect, restrictTo('admin'), deleteAppointment);
+  .delete(protect,  deleteAppointment);
 
 module.exports = router;

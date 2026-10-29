@@ -1,5 +1,5 @@
-const Appointment = require('../models/Appointment');
-const Doctor = require('../models/Doctor');
+import Appointment from '../models/Appointment.js';
+import Doctor from '../models/Doctor.js';
 // @desc    Get all appointments with filters
 // @route   GET /api/appointments
 exports.getAppointments = async (req, res) => {
